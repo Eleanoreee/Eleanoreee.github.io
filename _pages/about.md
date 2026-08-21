@@ -24,8 +24,10 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
-I am interested in optimization, machine learning theory, and distributionally robust optimization.
+I am an undergraduate student in Mathematics at the University of Illinois Urbana-Champaign, concentrating in Data Optimization and minoring in Statistics. I am broadly interested in stochastic optimization and decision-making under uncertainty, with a particular focus on distributionally robust optimization and learning theory.
 
-This site collects research notes that are useful and complete enough to share, even when they are not intended to become full papers. The notes may include corrected proofs, small theoretical results, counterexamples, and expository discussions.
+I am currently conducting independent research with Professor Yifan Hu on high-probability convergence guarantees for sample-average approximation and stochastic minimax optimization, as well as convergence questions arising in causal invariance learning.
 
-Whenever possible, I accompany a note with explicit verification information, including independent checks and Lean formalization artifacts.
+Previously, I worked with Professor Felix Leditzky through the Illinois Mathematics Lab on numerical optimization for entropy-based problems in quantum information theory. This project received the Nancy D. Anderson Undergraduate Research Award.
+
+This website collects research notes that are useful and complete enough to share, even when they are not intended to become full papers. These notes may include corrected proofs, small theoretical results, counterexamples, and expository discussions. Whenever feasible, I include explicit verification records and Lean 4 formalization artifacts.
