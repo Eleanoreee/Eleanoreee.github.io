@@ -43,4 +43,4 @@ I am interested in the intersection of operations research, statistics, and mach
 
 ## Research Notes
 
-This website collects research notes that are useful and complete enough to share, even when they are not intended to become full papers. These notes may include corrected proofs, small theoretical results, counterexamples, and expository discussions. Whenever feasible, I include explicit verification records and Lean 4 formalization artifacts.
+This website collects research notes on optimization, learning theory, and related topics. I aim to present each result with clear motivation, precise statements, and complete proofs. Selected notes are accompanied by Lean 4 formalizations and explicit verification records.
