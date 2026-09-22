@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "A Lean-Verified Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization"
-card_title: "Lean-Verified Stochastic NegDRO"
+title: "Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization (NegDRO)"
+card_title: "Fresh-Sample Stochastic NegDRO"
 date: 2026-09-19
 description: "A formalized research note on projected stochastic primal descent, exponentiated-gradient dual ascent, and finite-time expected squared-error bounds for NegDRO. The complete conditional proof chain is verified in Lean 4."
 reading_time: 14
-tags: [Optimization, DRO, Lean]
+tags: [optimization, DRO, causal learning]
 categories: [research-notes]
 related_posts: false
 featured: false
@@ -258,33 +258,44 @@ toc:
 <div class="note-kicker">Research Note · Formalized</div>
 
 <div class="note-meta" aria-label="Article metadata">
-  <span>Eleanore Wu</span><span>September 2026</span><span>Optimization · Distributional Robustness · Formal Verification</span><span>14 min read</span>
+  <span>Tingyu Wu</span><span>September 2026</span><span>optimization · Distributional Robustness · causal invariance learning</span><span>14 min read</span>
 </div>
 
-<p class="note-lead"><strong>Abstract.</strong> This note develops an online stochastic extension of Negative-Weighted Distributionally Robust Optimization (NegDRO). Primal projected SGD and dual exponentiated-gradient ascent use fresh observations, and both oracle updates may use the same round sample. Under a corrected realized additive-intervention reduced form, a universal fresh conditional law, fourth-moment bounds, bounded closed convex geometry, and a fixed spectral heterogeneity witness, the analysis gives finite-time expected squared-error bounds. Equal steps $\eta_b=\eta_w=T^{-1/2}$ produce an inverse-square-root optimization term; the penalized theorem adds the structural bias $2\mu/\lambda$. Lean verifies the complete conditional proof chain. This is a fresh-sample stochastic extension, not a literal formalization of official v3 Algorithm&nbsp;1.</p>
+<div class="note-callout" role="note">
+<span class="note-label">Draft status</span>
+Work in progress — the mathematical content and presentation are still under revision.
+</div>
+
+<div class="note-lead" markdown="1">
+
+**Abstract.** Learning causal relationships from heterogeneous environments often relies on the premise that the causal outcome model remains invariant across environments. [Wang et al.](https://arxiv.org/abs/2412.11850v3) introduced Negative Weight Distributionally Robust Optimization (NegDRO) in _Causal Invariance Learning via Efficient Optimization of a Nonconvex Objective_, which formulates causal identification as a continuous minimax problem. Their algorithm is based on empirical risks and exact maximization over the environmental weights at each iteration.
+
+This note develops an online stochastic counterpart in which observations arrive sequentially. We analyze a coupled primal-dual method that updates the prediction parameter by projected stochastic gradient descent and the environmental weights by exponentiated-gradient ascent; both updates may use the same fresh observation. Under a corrected realized reduced-form model, a fresh-sampling condition across environments, suitable moment and feasibility assumptions, and a fixed spectral witness of environmental heterogeneity, we establish explicit finite-time bounds for both the time-averaged and averaged-iterate expected squared estimation error. With inverse-square-root step sizes, the optimization error decays as $O(T^{-1/2})$; the remaining terms separate identification error from the additional penalization bias $2\mu/\lambda$. The complete conditional proof chain is formalized in Lean 4 and Mathlib.
+
+Thus, the contribution is a formally verified fresh-sample stochastic extension of NegDRO, rather than a literal formalization of the original empirical-risk algorithm.
+
+</div>
 
 <div class="note-actions" aria-label="Primary article links">
   <a class="note-button primary" href="{{ '/assets/pdf/negdro-formalization-note.pdf' | relative_url }}">Read the PDF</a>
-  <a class="note-button" href="https://github.com/Eleanoreee/NegDROFormalization">View formalization <span aria-label="release candidate">&nbsp;· private release candidate</span></a>
+  <a class="note-button" href="https://github.com/Eleanoreee/NegDROFormalization">View formalization</a>
 </div>
 
 <nav class="mobile-toc" aria-label="Article contents">
   <strong>On this page</strong>
-  <a href="#the-problem">Problem</a>
-  <a href="#model-and-corrected-reduced-form">Model</a>
-  <a href="#the-stochastic-algorithm">Algorithm</a>
-  <a href="#main-result">Result</a>
-  <a href="#proof-idea">Proof idea</a>
-  <a href="#what-lean-verifies">Lean</a>
-  <a href="#use-of-ai-and-formal-verification">AI use</a>
-  <a href="#scope">Scope</a>
-  <a href="#references-and-citation">References</a>
-  <a href="#appendix">Appendix</a>
+  <a href="#introduction-and-background">Introduction</a>
+  <a href="#model-setup-and-algorithm">Model &amp; algorithm</a>
+  <a href="#penalized-negdro">Penalized</a>
+  <a href="#unpenalized-negdro">Unpenalized</a>
+  <a href="#discussion-and-conclusion">Discussion</a>
+  <a href="#references">References</a>
+  <a href="#proof-appendix">Proof appendix</a>
+  <a href="#lean-verification">Lean verification</a>
 </nav>
 
 The mathematical note is the detailed source; this page is a guided account of the model, algorithm, result, proof architecture, and formal verification boundary.
 
-## 1. The problem
+## 1. Introduction and Background
 
 Multi-environment data can help separate a stable causal relationship from environment-specific predictive associations. NegDRO encodes this idea through a minimax objective whose effective environmental weights may be negative. Those weights penalize variation in risk across environments, so sufficiently heterogeneous environments can identify the invariant outcome coefficient $\beta^\star$.
 
@@ -297,7 +308,9 @@ That move is nontrivial. The iterates are adaptive, the primal and dual gradient
 Projected stochastic primal descent coupled with exponentiated-gradient dual ascent admits explicit finite-time and $T^{-1/2}$ expected squared-error bounds under a fresh conditional sampling law, with separate identification and penalization biases—and the full conditional chain is checked in Lean.
 </div>
 
-## 2. Model and corrected reduced form
+## 2. Model Setup and Algorithm
+
+### Model Setup
 
 For environment $e$, the realized additive-intervention model is
 
@@ -346,7 +359,7 @@ Equation (10) of the official v3 PDF forces the positive reduced-form term $+G^\
 
 The final public Lean theorem starts from the realized maps $G^\top,B_{YX},\eta_Y,\eta_X,\delta_e$. The inverse calculation is motivation and bridge material: the final assumption bundle does not reconstruct $G^\top$ from $B_{XX}$, nor does it assume acyclicity.
 
-## 3. The stochastic algorithm
+### Online Projected Primal-Dual Algorithm
 
 Let $C\subseteq\mathbb R^p$ be nonempty, closed, convex, and bounded, with $b_{\rm Init},\beta^\star\in C$. The algorithm uses the actual Euclidean nearest-point projection $P_C$. The dual variable lies in the simplex $\Delta_m$ and starts from the uniform weight $m^{-1}\mathbf 1$.
 
@@ -390,7 +403,7 @@ $$
 
 Both oracles are evaluated at the same current state and may share the same fresh observation. No primal–dual oracle independence is needed. The fixed $w^0\in\Delta_m$ used below is a deterministic spectral witness and analytical comparator; it is **not** the algorithmic initialization.
 
-## 4. Main result
+## 3. Penalized NegDRO
 
 We use Lean's zero-based convention: rounds are $t=0,\ldots,T-1$. Define
 
@@ -403,8 +416,37 @@ $$
 The complete assumption interface is recorded in [Appendix A](#appendix-a--exact-assumption-interface).
 
 <div class="note-theorem">
-<span class="note-label">Theorem · unpenalized finite-time bound</span>
+<span class="note-label">Theorem · penalized finite-time bound</span>
 Under the corrected realized model, universal fresh conditional law, fourth-moment bounds, bounded closed convex feasible geometry, and fixed spectral witness with curvature $\lambda>0$,
+
+$$
+\begin{aligned}
+D_T\le{}&
+\frac{\|b_{\rm Init}-\beta^\star\|_2^2}{2\lambda\eta_bT}
++\frac{\|v_{\rm SEM}\|_2^2}{\lambda^2(1+\gamma m)^2}
++\frac{2\log m}{\lambda\eta_wT}\\
+&+\frac{\eta_wG_{w,\mu}^2}{\lambda}
++\frac{\eta_bG_b^2}{2\lambda}
++\frac{2\mu}{\lambda}.
+\end{aligned}
+$$
+
+</div>
+
+The additional $2\mu/\lambda$ is a structural penalization bias, while $G_{w,\mu}^2$ replaces the unpenalized dual moment constant. The averaged-iterate theorem bounds $\mathbb E\lVert\bar b_T-\beta^\star\rVert_2^2$ by the same right-hand side.
+
+With $\eta_b=\eta_w=T^{-1/2}$,
+
+$$
+D_T\le B_{\rm id}+\frac{2\mu}{\lambda}+\frac{C_\mu}{\sqrt T}.
+$$
+
+## 4. Unpenalized NegDRO
+
+Setting $\mu=0$ removes the structural penalization bias and uses the unpenalized dual moment constant $G_{w,0}^2$.
+
+<div class="note-theorem">
+<span class="note-label">Theorem · unpenalized finite-time bound</span>
 
 $$
 \begin{aligned}
@@ -427,15 +469,13 @@ The five terms are, in order:
 4. **Dual stochastic error:** controlled by the dual oracle's squared moment bound.
 5. **Primal stochastic error:** controlled by the primal oracle's squared moment bound.
 
-For the penalized objective, replace $G_{w,0}^2$ by $G_{w,\mu}^2$ and add **exactly** $2\mu/\lambda$. The averaged-iterate theorem bounds $\mathbb E\lVert\bar b_T-\beta^\star\rVert_2^2$ by the same right-hand side.
-
-With $\eta_b=\eta_w=T^{-1/2}$, the public rate theorems become
+The averaged-iterate theorem has the same right-hand side. With $\eta_b=\eta_w=T^{-1/2}$,
 
 $$
-D_T\le B_{\rm id}+\frac{C_0}{\sqrt T},
-\qquad
-D_T\le B_{\rm id}+\frac{2\mu}{\lambda}+\frac{C_\mu}{\sqrt T}.
+D_T\le B_{\rm id}+\frac{C_0}{\sqrt T}.
 $$
+
+## 5. Discussion and Conclusion
 
 ### How to read the rate
 
@@ -446,7 +486,49 @@ $$
   <div><strong>Output type</strong><br>The result controls a time-average and an averaged iterate, not the last iterate.</div>
 </div>
 
-## 5. Proof idea
+<div class="scope-grid">
+  <div>
+    <h3>This result is</h3>
+    <ul>
+      <li>a finite-dimensional conditional convergence proof;</li>
+      <li>a fresh-sample stochastic extension;</li>
+      <li>projected primal SGD with dual EG ascent;</li>
+      <li>an expected squared-error result;</li>
+      <li>a time-average and averaged-iterate result.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>This result is not</h3>
+    <ul>
+      <li>official v3 Algorithm 1;</li>
+      <li>a last-iterate or high-probability theorem;</li>
+      <li>an expected-norm theorem;</li>
+      <li>a product-space or infinite i.i.d. stream construction;</li>
+      <li>assumption-free convergence;</li>
+      <li>verification of the inconsistent printed Eq. (97).</li>
+    </ul>
+  </div>
+</div>
+
+No <code>Asymptotics.IsBigO</code> wrapper is claimed. The formalization provides explicit finite-time inequalities and their exact $1/\sqrt T$ specializations.
+
+The central conclusion is that a fresh-sample projected primal–dual recursion retains an explicit inverse-square-root optimization term while separating the persistent identification and penalization biases. The result is deliberately conditional and finite-time: its value is the exact bridge from the stochastic oracle model to the stated expected squared-error guarantees.
+
+## 6. References
+
+1. Zhenyu Wang, Yifan Hu, Peter Bühlmann, and Zijian Guo. _Causal Invariance Learning via Efficient Nonconvex Optimization_. [arXiv:2412.11850v3](https://arxiv.org/abs/2412.11850v3), 2026.
+2. Shai Shalev-Shwartz. _Online Learning and Online Convex Optimization_. Foundations and Trends in Machine Learning, 4(2):107–194, 2012.
+3. Leonardo de Moura and Sebastian Ullrich. _The Lean 4 Theorem Prover and Programming Language_. CADE 28, 2021.
+4. The Mathlib Community. _The Lean Mathematical Library_. CPP 2020.
+
+<div class="note-source">
+<span class="note-label">Provisional citation</span>
+Tingyu Wu. “Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization (NegDRO).” Version 1.0, September 2026. Research note accompanying the Lean formalization. Citation metadata remains provisional until authorship and <code>CITATION.cff</code> are finalized.
+</div>
+
+## 7. Proof Appendix
+
+{: .appendix-boundary}
 
 The proof is a seven-step pipeline. The diagram is deliberately compact; the key mathematical interfaces appear immediately below it.
 
@@ -533,69 +615,6 @@ $$
 
 Lean proves this finite-dimensional Jensen step and composes it with the trajectory theorem; it does not infer a last-iterate result.
 
-## 6. What Lean verifies
-
-<div class="note-verification">
-<span class="note-label">Checked development</span>
-Lean <code>v4.34.0-rc2</code> · Mathlib <code>85e3a25e006c35636f0e53b0e9296caca2685bc0</code> · 50/50 root imports · local and GitHub Actions builds successful · <code>Build completed successfully (8814 jobs)</code>
-</div>
-
-The development derives the selected moments from the universal fresh conditional law, then proves concrete oracle conditional unbiasedness, integrability, and moment bounds. It also formalizes actual Euclidean projection, entropy/Pinsker geometry and mirror regret, spectral curvature, the primal recursion, telescoping convergence, and finite Jensen averaging.
-
-A source audit found no genuine occurrences of <code>sorry</code>, <code>admit</code>, <code>sorryAx</code>, custom <code>axiom</code> declarations, <code>unsafe</code>, <code>opaque</code>, <code>native_decide</code>, <code>implemented_by</code>, or <code>extern</code>. Local <code>#print axioms</code> checks for the central projection, oracle-integrability, and final convergence theorems report only <code>propext</code>, <code>Classical.choice</code>, and <code>Quot.sound</code>, the standard kernel dependencies reached through Mathlib.
-
-The six final projected public entry points are listed exactly in [Appendix B](#appendix-b--constants-and-all-theorem-variants). These facts describe a checked conditional development; they are not a claim of peer review or independent third-party reproduction.
-
-## 7. Use of AI and formal verification
-
-AI tools assisted with library API discovery, translation of paper arguments into Lean statements, refactoring, debugging, and adversarial correspondence audits. Model output was never treated as mathematical evidence by itself.
-
-Claims were retained only after Lean elaboration and kernel checking, successful full builds, axiom inspection, source scans, and repeated comparisons between the source semantics, the mathematical note, and the public Lean declarations. The mathematical note and kernel-checked terms—not an AI transcript—are the evidence for the claims on this page.
-
-## 8. Scope
-
-<div class="scope-grid">
-  <div>
-    <h3>This result is</h3>
-    <ul>
-      <li>a finite-dimensional conditional convergence proof;</li>
-      <li>a fresh-sample stochastic extension;</li>
-      <li>projected primal SGD with dual EG ascent;</li>
-      <li>an expected squared-error result;</li>
-      <li>a time-average and averaged-iterate result.</li>
-    </ul>
-  </div>
-  <div>
-    <h3>This result is not</h3>
-    <ul>
-      <li>official v3 Algorithm 1;</li>
-      <li>a last-iterate or high-probability theorem;</li>
-      <li>an expected-norm theorem;</li>
-      <li>a product-space or infinite i.i.d. stream construction;</li>
-      <li>assumption-free convergence;</li>
-      <li>verification of the inconsistent printed Eq. (97).</li>
-    </ul>
-  </div>
-</div>
-
-No <code>Asymptotics.IsBigO</code> wrapper is claimed. The formalization provides explicit finite-time inequalities and their exact $1/\sqrt T$ specializations.
-
-## 9. References and citation
-
-1. Zhenyu Wang, Yifan Hu, Peter Bühlmann, and Zijian Guo. _Causal Invariance Learning via Efficient Nonconvex Optimization_. [arXiv:2412.11850v3](https://arxiv.org/abs/2412.11850v3), 2026.
-2. Shai Shalev-Shwartz. _Online Learning and Online Convex Optimization_. Foundations and Trends in Machine Learning, 4(2):107–194, 2012.
-3. Leonardo de Moura and Sebastian Ullrich. _The Lean 4 Theorem Prover and Programming Language_. CADE 28, 2021.
-4. The Mathlib Community. _The Lean Mathematical Library_. CPP 2020.
-
-<div class="note-source">
-<span class="note-label">Provisional citation</span>
-Eleanore Wu. “A Lean-Verified Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization.” Version 1.0, September 2026. Research note accompanying the Lean formalization. Citation metadata remains provisional until authorship and <code>CITATION.cff</code> are finalized.
-</div>
-
-## Appendix
-
-{: .appendix-boundary}
-
 ### Appendix A — Exact assumption interface
 
 <details open markdown="1">
@@ -611,7 +630,7 @@ The six final projected theorems take one <code>AdditiveInterventionFreshSamplin
 
 Two indexing details matter: the fresh law is required only for the used rounds $t<T$, while concrete primal and dual next-round measurability are assumed for every natural $t$.
 
-Former technical fields for raw moments, oracle unbiasedness, oracle integrability, projection measurability/feasibility, quadratic nonnegativity, and coordinate curvature are derived rather than supplied by the caller. See the private release-candidate [assumption ledger](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/ASSUMPTION_LEDGER.md).
+Former technical fields for raw moments, oracle unbiasedness, oracle integrability, projection measurability/feasibility, quadratic nonnegativity, and coordinate curvature are derived rather than supplied by the caller. See the public [assumption ledger](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/ASSUMPTION_LEDGER.md).
 
 </details>
 
@@ -666,7 +685,7 @@ $$
 | <code>stochasticNegDRO_additiveSampling_projected_penalized_averaged_convergence</code>   | Same penalized RHS for the averaged iterate                  |
 | <code>stochasticNegDRO_additiveSampling_projected_penalized_invSqrt_rate</code>           | $B_{\rm id}+2\mu/\lambda+C_\mu/\sqrt T$ for $D_T$            |
 
-All six are in the private release-candidate module [<code>AdditiveInterventionSamplingProjectedConvergence.lean</code>](https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/AdditiveInterventionSamplingProjectedConvergence.lean).
+All six are in [<code>AdditiveInterventionSamplingProjectedConvergence.lean</code>](https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/AdditiveInterventionSamplingProjectedConvergence.lean).
 
 </details>
 
@@ -687,7 +706,7 @@ All six are in the private release-candidate module [<code>AdditiveInterventionS
 | Primal recursion         | Projected one-step recursion and stochastic expectation bridge                   | [<code>ExpectedPrimalRecursion.lean</code>](https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/ExpectedPrimalRecursion.lean)                                                                                                                        |
 | Averaged iterate         | Finite-dimensional squared-distance Jensen                                       | [<code>AveragedPrimalIterate.lean</code>](https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/AveragedPrimalIterate.lean)                                                                                                                            |
 
-The complete hierarchy is in the private release-candidate [theorem map](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md).
+The complete hierarchy is in the public [theorem map](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md).
 
 </details>
 
@@ -707,10 +726,29 @@ This grouping is intentionally higher-level than the 50-module root import. Exac
 
 </details>
 
-### Appendix E — Reproducibility
+## 8. Lean Verification
+
+<div class="note-verification">
+<span class="note-label">Checked development</span>
+Lean <code>v4.34.0-rc2</code> · Mathlib <code>85e3a25e006c35636f0e53b0e9296caca2685bc0</code> · 50/50 root imports · local and GitHub Actions builds successful · <code>Build completed successfully (8814 jobs)</code>
+</div>
+
+The development derives the selected moments from the universal fresh conditional law, then proves concrete oracle conditional unbiasedness, integrability, and moment bounds. It also formalizes actual Euclidean projection, entropy/Pinsker geometry and mirror regret, spectral curvature, the primal recursion, telescoping convergence, and finite Jensen averaging.
+
+A source audit found no genuine occurrences of <code>sorry</code>, <code>admit</code>, <code>sorryAx</code>, custom <code>axiom</code> declarations, <code>unsafe</code>, <code>opaque</code>, <code>native_decide</code>, <code>implemented_by</code>, or <code>extern</code>. Local <code>#print axioms</code> checks for the central projection, oracle-integrability, and final convergence theorems report only <code>propext</code>, <code>Classical.choice</code>, and <code>Quot.sound</code>, the standard kernel dependencies reached through Mathlib.
+
+The six final projected public entry points are listed exactly in [Appendix B](#appendix-b--constants-and-all-theorem-variants). These facts describe a checked conditional development; they are not a claim of peer review or independent third-party reproduction.
+
+### Use of AI and Formal Verification
+
+AI tools assisted with library API discovery, translation of paper arguments into Lean statements, refactoring, debugging, and adversarial correspondence audits. Model output was never treated as mathematical evidence by itself.
+
+Claims were retained only after Lean elaboration and kernel checking, successful full builds, axiom inspection, source scans, and repeated comparisons between the source semantics, the mathematical note, and the public Lean declarations. The mathematical note and kernel-checked terms—not an AI transcript—are the evidence for the claims on this page.
+
+### Reproducibility
 
 <details markdown="1">
-<summary>Pinned toolchain, build commands, and release-candidate artifacts</summary>
+<summary>Pinned toolchain, build commands, and public artifacts</summary>
 
 <pre><code>lake exe cache get
 lake build</code></pre>
@@ -721,7 +759,7 @@ lake build</code></pre>
 
 Artifacts: [PDF]({{ '/assets/pdf/negdro-formalization-note.pdf' | relative_url }}) · [README](https://github.com/Eleanoreee/NegDROFormalization/blob/main/README.md) · [Theorem map](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md) · [Assumption ledger](https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/ASSUMPTION_LEDGER.md)
 
-The GitHub links above are **private release-candidate links**. They work for authorized collaborators in this local draft and must be reviewed before any public deployment.
+The GitHub repository and verification artifacts are publicly accessible under the Apache License 2.0.
 
 </details>
 
