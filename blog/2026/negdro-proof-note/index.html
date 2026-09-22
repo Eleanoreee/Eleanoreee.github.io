@@ -1,0 +1,250 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization (NegDRO) | Tingyu Wu </title> <meta name="author" content="Tingyu Wu"> <meta name="description" content="A formalized research note on projected stochastic primal descent, exponentiated-gradient dual ascent, and finite-time expected squared-error bounds for NegDRO. The complete conditional proof chain is verified in Lean 4."> <meta name="keywords" content="research notes, optimization, machine learning, distributionally robust optimization, Lean"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%88%87&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=3116ba77db9ee1581d05bb3e86fbf7f1"> <link rel="canonical" href="https://eleanoreee.github.io/blog/2026/negdro-proof-note/"> <script src="/assets/js/theme.js?v=5286c3e4c334d0ecb8fc0c40ff4fa7ec"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Tingyu</span> Wu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">research notes </a> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="auto" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization (NegDRO)</h1> <p class="post-meta"> Created on September 19, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/optimization"> <i class="fa-solid fa-hashtag fa-sm"></i> optimization</a>   <a href="/blog/tag/dro"> <i class="fa-solid fa-hashtag fa-sm"></i> DRO</a>   <a href="/blog/tag/causal-learning"> <i class="fa-solid fa-hashtag fa-sm"></i> causal learning</a>   ·   <a href="/blog/category/research-notes"> <i class="fa-solid fa-tag fa-sm"></i> research-notes</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <style>
+  .negdro-note {
+    --note-ink: var(--global-text-color);
+    --note-muted: var(--global-text-color-light);
+    --note-accent: #2f6b62;
+    --note-accent-soft: rgba(47, 107, 98, 0.09);
+    --note-rule: var(--global-divider-color);
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .negdro-note .note-kicker {
+    color: var(--note-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    margin-bottom: 0.55rem;
+    text-transform: uppercase;
+  }
+  .negdro-note .note-meta {
+    color: var(--note-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.88rem;
+    gap: 0.35rem 0.7rem;
+    margin: 0.65rem 0 1.1rem;
+  }
+  .negdro-note .note-meta span:not(:last-child)::after {
+    content: "·";
+    margin-left: 0.7rem;
+  }
+  .negdro-note .note-lead {
+    font-size: 1.08rem;
+    line-height: 1.72;
+  }
+  .negdro-note .note-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin: 1.25rem 0 2.25rem;
+  }
+  .negdro-note .note-button {
+    border: 1px solid var(--note-accent);
+    border-radius: 0.35rem;
+    color: var(--note-accent);
+    display: inline-flex;
+    font-size: 0.88rem;
+    font-weight: 650;
+    padding: 0.58rem 0.85rem;
+    text-decoration: none;
+  }
+  .negdro-note .note-button.primary {
+    background: var(--note-accent);
+    color: #fff;
+  }
+  .negdro-note .note-button:focus-visible,
+  .negdro-note summary:focus-visible {
+    outline: 3px solid rgba(47, 107, 98, 0.35);
+    outline-offset: 3px;
+  }
+  .negdro-note .note-callout,
+  .negdro-note .note-theorem,
+  .negdro-note .note-verification,
+  .negdro-note .note-source {
+    border-left: 4px solid var(--note-accent);
+    margin: 1.4rem 0;
+    padding: 1rem 1.15rem;
+  }
+  .negdro-note .note-callout,
+  .negdro-note .note-verification {
+    background: var(--note-accent-soft);
+  }
+  .negdro-note .note-theorem {
+    background: var(--global-card-bg-color);
+    border-bottom: 1px solid var(--note-rule);
+    border-right: 1px solid var(--note-rule);
+    border-top: 1px solid var(--note-rule);
+  }
+  .negdro-note .note-source {
+    border-color: #a66b2f;
+    color: var(--note-muted);
+    font-size: 0.94rem;
+  }
+  .negdro-note .note-label {
+    color: var(--note-accent);
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+  }
+  .negdro-note .equation-scroll {
+    overflow-x: auto;
+    padding: 0.25rem 0;
+  }
+  .negdro-note mjx-container[display="true"],
+  .negdro-note table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .negdro-note .mobile-toc {
+    display: none;
+  }
+  .negdro-note .update-map {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 1.4rem 0;
+  }
+  .negdro-note .update-source {
+    background: var(--note-accent-soft);
+    border: 1px solid var(--note-rule);
+    border-radius: 0.45rem;
+    font-weight: 650;
+    grid-column: 1 / -1;
+    padding: 0.8rem;
+    text-align: center;
+  }
+  .negdro-note .update-track {
+    border: 1px solid var(--note-rule);
+    border-radius: 0.45rem;
+    padding: 0.9rem;
+  }
+  .negdro-note .update-track strong {
+    color: var(--note-accent);
+  }
+  .negdro-note .proof-flow {
+    counter-reset: proof-step;
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 1.5rem 0 2rem;
+  }
+  .negdro-note .proof-node {
+    background: var(--global-card-bg-color);
+    border-top: 3px solid var(--note-accent);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
+    min-height: 6.3rem;
+    padding: 0.8rem;
+  }
+  .negdro-note .proof-node::before {
+    color: var(--note-accent);
+    content: counter(proof-step, decimal-leading-zero);
+    counter-increment: proof-step;
+    display: block;
+    font-size: 0.73rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+  .negdro-note .proof-node:last-child {
+    grid-column: 2 / 4;
+  }
+  .negdro-note .term-grid,
+  .negdro-note .scope-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 1.2rem 0;
+  }
+  .negdro-note .term-grid > div,
+  .negdro-note .scope-grid > div {
+    border: 1px solid var(--note-rule);
+    border-radius: 0.4rem;
+    padding: 0.9rem 1rem;
+  }
+  .negdro-note .scope-grid h3 {
+    font-size: 1rem;
+    margin-top: 0;
+  }
+  .negdro-note .appendix-boundary {
+    border-top: 2px solid var(--note-accent);
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+  }
+  .negdro-note details {
+    border-bottom: 1px solid var(--note-rule);
+    padding: 0.65rem 0;
+  }
+  .negdro-note summary {
+    color: var(--note-ink);
+    cursor: pointer;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 0.5rem 0;
+  }
+  .negdro-note details[open] summary {
+    color: var(--note-accent);
+    margin-bottom: 0.8rem;
+  }
+  .negdro-note table {
+    font-size: 0.88rem;
+  }
+  .negdro-note code {
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 760px) {
+    .negdro-note .proof-flow,
+    .negdro-note .term-grid,
+    .negdro-note .scope-grid,
+    .negdro-note .update-map {
+      grid-template-columns: 1fr;
+    }
+    .negdro-note .proof-node:last-child,
+    .negdro-note .update-source {
+      grid-column: 1;
+    }
+    .negdro-note .note-meta span::after {
+      display: none;
+    }
+    .negdro-note .note-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .negdro-note .note-button {
+      justify-content: center;
+    }
+    .negdro-note .mobile-toc {
+      background: var(--note-accent-soft);
+      border-left: 3px solid var(--note-accent);
+      display: block;
+      font-size: 0.9rem;
+      margin: 0 0 2rem;
+      padding: 0.85rem 1rem;
+    }
+    .negdro-note .mobile-toc strong {
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+    .negdro-note .mobile-toc a {
+      display: inline-block;
+      margin: 0.15rem 0.55rem 0.15rem 0;
+    }
+  }
+</style> <div class="negdro-note"> <div class="note-kicker">Research Note · Formalized</div> <div class="note-meta" aria-label="Article metadata"> <span>Tingyu Wu</span><span>September 2026</span><span>optimization · Distributional Robustness · causal invariance learning</span><span>14 min read</span> </div> <div class="note-callout" role="note"> <span class="note-label">Draft status</span> Work in progress — the mathematical content and presentation are still under revision. </div> <div class="note-lead"> <p><strong>Abstract.</strong> Learning causal relationships from heterogeneous environments often relies on the premise that the causal outcome model remains invariant across environments. <a href="https://arxiv.org/abs/2412.11850v3" rel="external nofollow noopener" target="_blank">Wang et al.</a> introduced Negative Weight Distributionally Robust Optimization (NegDRO) in <em>Causal Invariance Learning via Efficient Optimization of a Nonconvex Objective</em>, which formulates causal identification as a continuous minimax problem. Their algorithm is based on empirical risks and exact maximization over the environmental weights at each iteration.</p> <p>This note develops an online stochastic counterpart in which observations arrive sequentially. We analyze a coupled primal-dual method that updates the prediction parameter by projected stochastic gradient descent and the environmental weights by exponentiated-gradient ascent; both updates may use the same fresh observation. Under a corrected realized reduced-form model, a fresh-sampling condition across environments, suitable moment and feasibility assumptions, and a fixed spectral witness of environmental heterogeneity, we establish explicit finite-time bounds for both the time-averaged and averaged-iterate expected squared estimation error. With inverse-square-root step sizes, the optimization error decays as $O(T^{-1/2})$; the remaining terms separate identification error from the additional penalization bias $2\mu/\lambda$. The complete conditional proof chain is formalized in Lean 4 and Mathlib.</p> <p>Thus, the contribution is a formally verified fresh-sample stochastic extension of NegDRO, rather than a literal formalization of the original empirical-risk algorithm.</p> </div> <div class="note-actions" aria-label="Primary article links"> <a class="note-button primary" href="/assets/pdf/negdro-formalization-note.pdf">Read the PDF</a> <a class="note-button" href="https://github.com/Eleanoreee/NegDROFormalization" rel="external nofollow noopener" target="_blank">View formalization</a> </div> <nav class="mobile-toc" aria-label="Article contents"> <strong>On this page</strong> <a href="#introduction-and-background">Introduction</a> <a href="#model-setup-and-algorithm">Model &amp; algorithm</a> <a href="#penalized-negdro">Penalized</a> <a href="#unpenalized-negdro">Unpenalized</a> <a href="#discussion-and-conclusion">Discussion</a> <a href="#references">References</a> <a href="#proof-appendix">Proof appendix</a> <a href="#lean-verification">Lean verification</a> </nav> <p>The mathematical note is the detailed source; this page is a guided account of the model, algorithm, result, proof architecture, and formal verification boundary.</p> <h2 id="introduction-and-background">1. Introduction and Background</h2> <p>Multi-environment data can help separate a stable causal relationship from environment-specific predictive associations. NegDRO encodes this idea through a minimax objective whose effective environmental weights may be negative. Those weights penalize variation in risk across environments, so sufficiently heterogeneous environments can identify the invariant outcome coefficient $\beta^\star$.</p> <p>The official algorithms in <a href="https://arxiv.org/abs/2412.11850v3" rel="external nofollow noopener" target="_blank">arXiv:2412.11850v3</a> optimize empirical risks from a fixed data set. In particular, official Algorithm 1 exactly maximizes the penalized empirical objective over the environmental weights before taking a primal step. Here the question is different: can one draw one fresh environmental observation per round, update the primal and dual variables simultaneously, and still obtain a direct population error bound?</p> <p>That move is nontrivial. The iterates are adaptive, the primal and dual gradients may share the same sample, the dual update must preserve the simplex, and the proof must translate a static heterogeneity condition into curvature along a stochastic trajectory.</p> <div class="note-callout"> <span class="note-label">Result in one sentence</span> Projected stochastic primal descent coupled with exponentiated-gradient dual ascent admits explicit finite-time and $T^{-1/2}$ expected squared-error bounds under a fresh conditional sampling law, with separate identification and penalization biases—and the full conditional chain is checked in Lean. </div> <h2 id="model-setup-and-algorithm">2. Model Setup and Algorithm</h2> <h3 id="model-setup">Model Setup</h3> <p>For environment $e$, the realized additive-intervention model is</p> <div class="equation-scroll"> $$ X^e=G^\top(B_{YX}\eta_Y+\eta_X+\delta_e), \qquad Y^e=\beta^{\star\top}X^e+\eta_Y. $$ </div> <p>It comes from the structural equations $Y=\beta^{\star\top}X+\varepsilon_Y$ and $X=B_{YX}Y+B_{XX}X+\varepsilon_X$. Direct elimination gives</p> \[\bigl((I-B_{XX})-B_{YX}\beta^{\star\top}\bigr)X =B_{YX}\varepsilon_Y+\varepsilon_X.\] <p>Let $\Sigma_e=\mathbb E[X^eX^{e\top}]$, $\sigma_Y^2=\mathbb E[\eta_Y^2]$, and</p> \[v_{\rm SEM}:=-G^\top\mathbb E[(B_{YX}\eta_Y+\eta_X)\eta_Y].\] <p>The squared-loss population risk then expands as</p> <div class="equation-scroll"> $$ R_e(b) =\sigma_Y^2 +2v_{\rm SEM}^{\top}(b-\beta^\star) +(b-\beta^\star)^\top\Sigma_e(b-\beta^\star). $$ </div> <p>The vector $v_{\rm SEM}$ is the common linear term left after the environmental intervention cross-moments vanish. Its norm controls the persistent identification contribution: even when the optimization error decays, this linear mismatch is balanced against spectral curvature through a vector Young inequality.</p> <div class="note-source"> <span class="note-label">Source note</span> Equation (10) of the official v3 PDF forces the positive reduced-form term $+G^\top B_{YX}\varepsilon_Y$. Appendix E.1 Eq. (97) prints the opposite lower-left sign, and its later negative cross terms conflict with the displayed positive-block factorization. This project verifies the corrected identity forced by Eq. (10); it does not claim to verify the inconsistent printed Eq. (97). </div> <p>The final public Lean theorem starts from the realized maps $G^\top,B_{YX},\eta_Y,\eta_X,\delta_e$. The inverse calculation is motivation and bridge material: the final assumption bundle does not reconstruct $G^\top$ from $B_{XX}$, nor does it assume acyclicity.</p> <h3 id="online-projected-primal-dual-algorithm">Online Projected Primal-Dual Algorithm</h3> <p>Let $C\subseteq\mathbb R^p$ be nonempty, closed, convex, and bounded, with $b_{\rm Init},\beta^\star\in C$. The algorithm uses the actual Euclidean nearest-point projection $P_C$. The dual variable lies in the simplex $\Delta_m$ and starts from the uniform weight $m^{-1}\mathbf 1$.</p> <p>For a fresh round sample $(E_t,X_t,Y_t)$, the coordinate oracles are</p> <div class="equation-scroll"> $$ \widehat g_{t,i}^{b} =2m\left(w_{t,E_t}-\frac{\gamma}{1+\gamma m}\right) (X_t^\top b_t-Y_t)X_{t,i}, $$ $$ \widehat g_{t,j}^{w,\mu} =m(Y_t-X_t^\top b_t)^2\mathbf 1_{\{j=E_t\}} -2\mu w_{t,j}. $$ </div> <p>The coupled recursion is</p> <div class="equation-scroll"> $$ b_{t+1}=P_C\!\left(b_t-\eta_b\widehat g_t^b\right), \qquad w_{t+1,j}= \frac{w_{t,j}\exp(\eta_w\widehat g_{t,j}^{w,\mu})} {\sum_k w_{t,k}\exp(\eta_w\widehat g_{t,k}^{w,\mu})}. $$ </div> <div class="update-map" role="img" aria-label="A shared fresh observation feeds the primal descent and dual ascent updates"> <div class="update-source">Fresh observation $(E_t,X_t,Y_t)$ + current state $(b_t,w_t)$</div> <div class="update-track"> <strong>Primal track</strong><br>Form $\widehat g_t^b$ → descend → project onto $C$</div> <div class="update-track"> <strong>Dual track</strong><br>Form $\widehat g_t^{w,\mu}$ → ascend → normalize by exponentiated gradient</div> </div> <p>Both oracles are evaluated at the same current state and may share the same fresh observation. No primal–dual oracle independence is needed. The fixed $w^0\in\Delta_m$ used below is a deterministic spectral witness and analytical comparator; it is <strong>not</strong> the algorithmic initialization.</p> <h2 id="penalized-negdro">3. Penalized NegDRO</h2> <p>We use Lean’s zero-based convention: rounds are $t=0,\ldots,T-1$. Define</p> \[D_T=\frac1T\sum_{t=0}^{T-1}\mathbb E\|b_t-\beta^\star\|_2^2, \qquad \bar b_T=\frac1T\sum_{t=0}^{T-1}b_t.\] <p>The complete assumption interface is recorded in <a href="#appendix-a--exact-assumption-interface">Appendix A</a>.</p> <div class="note-theorem"> <span class="note-label">Theorem · penalized finite-time bound</span> Under the corrected realized model, universal fresh conditional law, fourth-moment bounds, bounded closed convex feasible geometry, and fixed spectral witness with curvature $\lambda&gt;0$, $$ \begin{aligned} D_T\le{}&amp; \frac{\|b_{\rm Init}-\beta^\star\|_2^2}{2\lambda\eta_bT} +\frac{\|v_{\rm SEM}\|_2^2}{\lambda^2(1+\gamma m)^2} +\frac{2\log m}{\lambda\eta_wT}\\ &amp;+\frac{\eta_wG_{w,\mu}^2}{\lambda} +\frac{\eta_bG_b^2}{2\lambda} +\frac{2\mu}{\lambda}. \end{aligned} $$ </div> <p>The additional $2\mu/\lambda$ is a structural penalization bias, while $G_{w,\mu}^2$ replaces the unpenalized dual moment constant. The averaged-iterate theorem bounds $\mathbb E\lVert\bar b_T-\beta^\star\rVert_2^2$ by the same right-hand side.</p> <p>With $\eta_b=\eta_w=T^{-1/2}$,</p> \[D_T\le B_{\rm id}+\frac{2\mu}{\lambda}+\frac{C_\mu}{\sqrt T}.\] <h2 id="unpenalized-negdro">4. Unpenalized NegDRO</h2> <p>Setting $\mu=0$ removes the structural penalization bias and uses the unpenalized dual moment constant $G_{w,0}^2$.</p> <div class="note-theorem"> <span class="note-label">Theorem · unpenalized finite-time bound</span> $$ \begin{aligned} D_T\le{}&amp; \frac{\|b_{\rm Init}-\beta^\star\|_2^2}{2\lambda\eta_bT} +\frac{\|v_{\rm SEM}\|_2^2}{\lambda^2(1+\gamma m)^2} +\frac{2\log m}{\lambda\eta_wT}\\ &amp;+\frac{\eta_wG_{w,0}^2}{\lambda} +\frac{\eta_bG_b^2}{2\lambda}. \end{aligned} $$ </div> <p>The five terms are, in order:</p> <ol> <li> <strong>Initialization:</strong> the starting distance divided by primal step, curvature, and horizon.</li> <li> <strong>Identification bias:</strong> the common SEM linear term balanced against the fixed-witness curvature.</li> <li> <strong>Initial entropy potential:</strong> the uniform dual initialization contributes at most $\log m$.</li> <li> <strong>Dual stochastic error:</strong> controlled by the dual oracle’s squared moment bound.</li> <li> <strong>Primal stochastic error:</strong> controlled by the primal oracle’s squared moment bound.</li> </ol> <p>The averaged-iterate theorem has the same right-hand side. With $\eta_b=\eta_w=T^{-1/2}$,</p> \[D_T\le B_{\rm id}+\frac{C_0}{\sqrt T}.\] <h2 id="discussion-and-conclusion">5. Discussion and Conclusion</h2> <h3 id="how-to-read-the-rate">How to read the rate</h3> <div class="term-grid"> <div> <strong>Identification bias</strong><br>$B_{\rm id}$ persists with $T$ and comes from $v_{\rm SEM}$.</div> <div> <strong>Penalization bias</strong><br>$2\mu/\lambda$ appears only in the penalized theorem.</div> <div> <strong>Optimization error</strong><br>$C_0/\sqrt T$ or $C_\mu/\sqrt T$ vanishes with the horizon.</div> <div> <strong>Output type</strong><br>The result controls a time-average and an averaged iterate, not the last iterate.</div> </div> <div class="scope-grid"> <div> <h3>This result is</h3> <ul> <li>a finite-dimensional conditional convergence proof;</li> <li>a fresh-sample stochastic extension;</li> <li>projected primal SGD with dual EG ascent;</li> <li>an expected squared-error result;</li> <li>a time-average and averaged-iterate result.</li> </ul> </div> <div> <h3>This result is not</h3> <ul> <li>official v3 Algorithm 1;</li> <li>a last-iterate or high-probability theorem;</li> <li>an expected-norm theorem;</li> <li>a product-space or infinite i.i.d. stream construction;</li> <li>assumption-free convergence;</li> <li>verification of the inconsistent printed Eq. (97).</li> </ul> </div> </div> <p>No <code>Asymptotics.IsBigO</code> wrapper is claimed. The formalization provides explicit finite-time inequalities and their exact $1/\sqrt T$ specializations.</p> <p>The central conclusion is that a fresh-sample projected primal–dual recursion retains an explicit inverse-square-root optimization term while separating the persistent identification and penalization biases. The result is deliberately conditional and finite-time: its value is the exact bridge from the stochastic oracle model to the stated expected squared-error guarantees.</p> <h2 id="references">6. References</h2> <ol> <li>Zhenyu Wang, Yifan Hu, Peter Bühlmann, and Zijian Guo. <em>Causal Invariance Learning via Efficient Nonconvex Optimization</em>. <a href="https://arxiv.org/abs/2412.11850v3" rel="external nofollow noopener" target="_blank">arXiv:2412.11850v3</a>, 2026.</li> <li>Shai Shalev-Shwartz. <em>Online Learning and Online Convex Optimization</em>. Foundations and Trends in Machine Learning, 4(2):107–194, 2012.</li> <li>Leonardo de Moura and Sebastian Ullrich. <em>The Lean 4 Theorem Prover and Programming Language</em>. CADE 28, 2021.</li> <li>The Mathlib Community. <em>The Lean Mathematical Library</em>. CPP 2020.</li> </ol> <div class="note-source"> <span class="note-label">Provisional citation</span> Tingyu Wu. “Fresh-Sample Stochastic Extension of Negative-Weighted Distributionally Robust Optimization (NegDRO).” Version 1.0, September 2026. Research note accompanying the Lean formalization. Citation metadata remains provisional until authorship and <code>CITATION.cff</code> are finalized. </div> <h2 id="proof-appendix">7. Proof Appendix</h2> <p class="appendix-boundary">The proof is a seven-step pipeline. The diagram is deliberately compact; the key mathematical interfaces appear immediately below it.</p> <div class="proof-flow" aria-label="Seven-step proof architecture"> <div class="proof-node">Risk expansion</div> <div class="proof-node">Spectral curvature</div> <div class="proof-node">Fresh-law oracles</div> <div class="proof-node">Projected recursion</div> <div class="proof-node">Entropy regret</div> <div class="proof-node">Telescope terms</div> <div class="proof-node">Jensen averaging</div> </div> <h3 id="step-1--corrected-population-risk-expansion">Step 1 — Corrected population-risk expansion</h3> <p>Expanding $(Y^e-b^\top X^e)^2$ around $\beta^\star$, then using the corrected reduced form and the systematic/intervention orthogonality conditions, yields the common linear term and environment-specific quadratic term in Section 2. Lean derives this equality from actual integrals and second moments rather than identifying two expressions by name.</p> <h3 id="step-2--fixed-witness-spectral-curvature">Step 2 — Fixed-witness spectral curvature</h3> <p>For a fixed simplex witness $w^0$, the weighted heterogeneity matrix has every eigenvalue at least $\lambda$. The resulting direction bound is</p> \[(b-\beta^\star)^\top\nabla_b\mathcal L(b,w^0) \ge \lambda\|b-\beta^\star\|_2^2-\varepsilon_{\rm id}, \qquad \varepsilon_{\rm id}=\frac{\|v_{\rm SEM}\|_2^2}{\lambda(1+\gamma m)^2}.\] <p>Lean connects Mathlib’s Hermitian eigenvalues to this coordinate quadratic curvature inequality.</p> <h3 id="step-3--fresh-law-oracle-identities-and-moments">Step 3 — Fresh-law oracle identities and moments</h3> <p>The universal conditional law is tested against the selected $XX$, $XY$, $Y^2$, and fourth-degree monomials. Predictability of $(b_t,w_t)$ then yields conditional unbiasedness and explicit moment bounds for the concrete oracles. The same observation may feed both oracles: only their separate conditional identities are used.</p> <h3 id="step-4--euclidean-projection-and-the-primal-recursion">Step 4 — Euclidean projection and the primal recursion</h3> <p>Because $\beta^\star\in C$, nearest-point projection gives the Fejér inequality</p> \[\|b_{t+1}-\beta^\star\|_2^2 \le \|b_t-\eta_b\widehat g_t^b-\beta^\star\|_2^2.\] <p>After expansion and conditional expectation, the cross term becomes the population direction and the square term is bounded by $G_b^2$. Lean formalizes the actual nearest-point projection, including existence, uniqueness, nonexpansiveness, and measurability.</p> <h3 id="step-5--exponentiated-gradient-entropy-regret">Step 5 — Exponentiated-gradient entropy regret</h3> <p>With the <strong>comparator-minus-current</strong> convention</p> \[\operatorname{Reg}_{t,\mu}^0 =\mathcal L_\mu(b_t,w^0)-\mathcal L_\mu(b_t,w_t),\] <p>the entropy argument gives</p> \[\sum_{t=0}^{T-1}\mathbb E[\operatorname{Reg}_{t,\mu}^0] \le \frac{\log m}{\eta_w}+\frac{\eta_wT G_{w,\mu}^2}{2}.\] <p>No claim is made that instantaneous regret is nonnegative. Lean proves the entropy three-point identity, finite Pinsker inequality, mirror remainder bound, simplex preservation, initial potential bound, and terminal potential nonnegativity.</p> <h3 id="step-6--comparator-reduction-telescoping-and-coefficients">Step 6 — Comparator reduction, telescoping, and coefficients</h3> <p>The current dual iterate is connected to the fixed witness by</p> \[(b_t-\beta^\star)^\top\nabla_b\mathcal L(b_t,w_t) \ge \lambda\|b_t-\beta^\star\|_2^2 -\varepsilon_{\rm id}-2\operatorname{Reg}_{t,0}^0\] <p>in the unpenalized case. In the penalized case the right-hand side loses exactly one additional $2\mu$. This comes from bounding $\lVert w^0\rVert_2^2-\lVert w_t\rVert_2^2\le1$, not from a $2\mu T$ term in the final average. Summing the primal recursion, inserting cumulative dual regret, telescoping distances, and dividing by $2\lambda\eta_bT$ produces the stated coefficients.</p> <h3 id="step-7--finite-jensen-for-the-averaged-iterate">Step 7 — Finite Jensen for the averaged iterate</h3> <p>Convexity of squared Euclidean distance gives</p> \[\mathbb E\|\bar b_T-\beta^\star\|_2^2 \le \frac1T\sum_{t=0}^{T-1}\mathbb E\|b_t-\beta^\star\|_2^2.\] <p>Lean proves this finite-dimensional Jensen step and composes it with the trajectory theorem; it does not infer a last-iterate result.</p> <h3 id="appendix-a--exact-assumption-interface">Appendix A — Exact assumption interface</h3> <details open=""> <summary>30 fields, grouped by mathematical role</summary> <p>The six final projected theorems take one <code>AdditiveInterventionFreshSamplingProjectedAssumptions</code> bundle, plus <code>[IsProbabilityMeasure mu]</code>. Penalized results also take $0\le\mu$.</p> <p><strong>Eight model/reduced-form fields.</strong> <code>hInt</code> supplies integrability of the coordinate products used in the corrected SEM calculation; <code>hZero</code> supplies systematic/intervention orthogonality; <code>hEnvXMeas</code> and <code>hEnvYMeas</code> give environmental measurability; <code>hEnvX4Int</code> and <code>hEnvY4Int</code> give fourth-moment integrability; <code>hEnvX4</code> and <code>hEnvY4</code> impose the quantitative bounds $K_X,K_Y$.</p> <p><strong>Five sampling fields.</strong> <code>hMono</code> makes the filtration increasing; <code>hmCond</code> embeds conditioning sigma-algebras in the ambient one; <code>hLaw</code> supplies the universal fresh law; <code>hPrimalMeas</code> and <code>hDualMeas</code> give next-round measurability of the concrete oracles.</p> <p><strong>Seventeen geometry/optimization fields.</strong> <code>hCNonempty</code>, <code>hCClosed</code>, and <code>hCConvex</code> support nearest-point projection; <code>hm</code>, <code>hT</code>, <code>hetaB</code>, <code>hetaW</code>, <code>hB</code>, <code>hKX</code>, <code>hKY</code>, <code>hgamma</code>, and <code>hlam</code> impose the required positivity/sign conditions; <code>hInit</code> and <code>hbetaStar</code> put the initialization and target in $C$; <code>hCBall</code> bounds $C$; <code>hw0</code> makes the witness a simplex point; and <code>hEigen</code> supplies the genuine Hermitian eigenvalue lower bound.</p> <p>Two indexing details matter: the fresh law is required only for the used rounds $t&lt;T$, while concrete primal and dual next-round measurability are assumed for every natural $t$.</p> <p>Former technical fields for raw moments, oracle unbiasedness, oracle integrability, projection measurability/feasibility, quadratic nonnegativity, and coordinate curvature are derived rather than supplied by the caller. See the public <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/ASSUMPTION_LEDGER.md" rel="external nofollow noopener" target="_blank">assumption ledger</a>.</p> </details> <h3 id="appendix-b--constants-and-all-theorem-variants">Appendix B — Constants and all theorem variants</h3> <details> <summary>Exact moment and rate constants</summary> <p>The symbols below already denote <strong>squared</strong> moment bounds:</p> \[G_b^2=4m\left(2\sqrt{K_YK_X}+2B^2K_X\right),\] \[G_{w,0}^2=m^2\left(8K_Y+8B^4K_X\right), \qquad G_{w,\mu}^2=2m^2\left(8K_Y+8B^4K_X\right)+8\mu^2.\] <p>The inverse-square-root constants are</p> \[B_{\rm id}=\frac{\|v_{\rm SEM}\|_2^2}{\lambda^2(1+\gamma m)^2},\] \[C_0=\frac{\|b_{\rm Init}-\beta^\star\|_2^2}{2\lambda} +\frac{2\log m}{\lambda} +\frac{G_{w,0}^2}{\lambda} +\frac{G_b^2}{2\lambda},\] \[C_\mu=\frac{\|b_{\rm Init}-\beta^\star\|_2^2}{2\lambda} +\frac{2\log m}{\lambda} +\frac{G_{w,\mu}^2}{\lambda} +\frac{G_b^2}{2\lambda}.\] </details> <details> <summary>Six projected public Lean entry points</summary> <table> <thead> <tr> <th>Lean declaration</th> <th>Mathematical conclusion</th> </tr> </thead> <tbody> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_unpenalized_convergence</code></td> <td>Unpenalized finite-time bound for $D_T$</td> </tr> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_unpenalized_averaged_convergence</code></td> <td>Same RHS for $\mathbb E\lVert\bar b_T-\beta^\star\rVert_2^2$</td> </tr> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_unpenalized_invSqrt_rate</code></td> <td>$B_{\rm id}+C_0/\sqrt T$ for $D_T$</td> </tr> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_penalized_convergence</code></td> <td>Penalized finite-time bound for $D_T$</td> </tr> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_penalized_averaged_convergence</code></td> <td>Same penalized RHS for the averaged iterate</td> </tr> <tr> <td><code>stochasticNegDRO_additiveSampling_projected_penalized_invSqrt_rate</code></td> <td>$B_{\rm id}+2\mu/\lambda+C_\mu/\sqrt T$ for $D_T$</td> </tr> </tbody> </table> <p>All six are in <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/AdditiveInterventionSamplingProjectedConvergence.lean" rel="external nofollow noopener" target="_blank"><code>AdditiveInterventionSamplingProjectedConvergence.lean</code></a>.</p> </details> <h3 id="appendix-c--technical-proof-ingredients">Appendix C — Technical proof ingredients</h3> <details> <summary>Fresh law, moment bridges, projection, entropy, recursion, and averaging</summary> <table> <thead> <tr> <th>Ingredient</th> <th>What is proved</th> <th>Principal module</th> </tr> </thead> <tbody> <tr> <td>Fresh conditional law</td> <td>Selected population monomials and fourth-moment consequences</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/FreshSamplingLaw.lean" rel="external nofollow noopener" target="_blank"><code>FreshSamplingLaw.lean</code></a></td> </tr> <tr> <td>Raw/adaptive moments</td> <td>Fresh selected moments become bounds along predictable trajectories</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/OracleIntegrabilityBridge.lean" rel="external nofollow noopener" target="_blank"><code>OracleIntegrabilityBridge.lean</code></a></td> </tr> <tr> <td>Oracle integrability</td> <td>Primal coordinates/squared norm and dual coordinates/bound square are integrable</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/OracleIntegrabilityBridge.lean" rel="external nofollow noopener" target="_blank"><code>OracleIntegrabilityBridge.lean</code></a></td> </tr> <tr> <td>Second moments</td> <td>Symmetry and quadratic nonnegativity of actual uncentered second moments</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/SecondMomentMatrixBridge.lean" rel="external nofollow noopener" target="_blank"><code>SecondMomentMatrixBridge.lean</code></a></td> </tr> <tr> <td>Spectral bridge</td> <td>Hermitian eigenvalue lower bounds imply coordinate curvature</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/SpectralCurvatureBridge.lean" rel="external nofollow noopener" target="_blank"><code>SpectralCurvatureBridge.lean</code></a></td> </tr> <tr> <td>Nearest-point projection</td> <td>Existence, uniqueness, Fejér inequality, nonexpansiveness, measurability</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/EuclideanProjectionBridge.lean" rel="external nofollow noopener" target="_blank"><code>EuclideanProjectionBridge.lean</code></a></td> </tr> <tr> <td>Entropy and Pinsker</td> <td>Three-point identity, finite Pinsker, mirror remainder, EG regret</td> <td> <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/EntropyGeometry.lean" rel="external nofollow noopener" target="_blank"><code>EntropyGeometry.lean</code></a>, <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/FinitePinsker.lean" rel="external nofollow noopener" target="_blank"><code>FinitePinsker.lean</code></a> </td> </tr> <tr> <td>Primal recursion</td> <td>Projected one-step recursion and stochastic expectation bridge</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/ExpectedPrimalRecursion.lean" rel="external nofollow noopener" target="_blank"><code>ExpectedPrimalRecursion.lean</code></a></td> </tr> <tr> <td>Averaged iterate</td> <td>Finite-dimensional squared-distance Jensen</td> <td><a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/NegDROFormalization/AveragedPrimalIterate.lean" rel="external nofollow noopener" target="_blank"><code>AveragedPrimalIterate.lean</code></a></td> </tr> </tbody> </table> <p>The complete hierarchy is in the public <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md" rel="external nofollow noopener" target="_blank">theorem map</a>.</p> </details> <h3 id="appendix-d--formalization-map">Appendix D — Formalization map</h3> <details> <summary>Modules grouped by proof responsibility</summary> <ul> <li> <strong>Model and SEM:</strong> <code>AdditiveInterventionPopulationBridge</code>, <code>AdditiveInterventionPopulationInterfaces</code>, <code>PopulationRiskMomentBridge</code>, <code>PopulationExpansion</code>.</li> <li> <strong>Sampling and moments:</strong> <code>FreshSamplingLaw</code>, <code>FreshFiniteEnvironmentMoments</code>, <code>FreshSamplingConditionalOracles</code>, <code>ConcreteStochasticOracles</code>, <code>ConcreteOracleMomentBounds</code>, <code>OracleIntegrabilityBridge</code>.</li> <li> <strong>Geometry and projection:</strong> <code>SecondMomentMatrixBridge</code>, <code>SpectralCurvatureBridge</code>, <code>SpectralWitnessInterface</code>, <code>EuclideanProjectionBridge</code>, <code>PrimalProjectionRecursion</code>.</li> <li> <strong>Entropy and regret:</strong> <code>EntropyGeometry</code>, <code>FinitePinsker</code>, <code>ExponentiatedGradient</code>, <code>MirrorRemainderBound</code>, <code>EGTrajectoryRegret</code>, <code>ExpectedEGTrajectoryRegret</code>, <code>StochasticDualRegret</code>.</li> <li> <strong>Convergence and rates:</strong> <code>ExpectedPrimalRecursion</code>, <code>StochasticNegDROConvergence</code>, <code>StochasticNegDROExplicitConstants</code>, <code>AveragedPrimalIterate</code>, <code>StochasticNegDRORates</code>.</li> <li> <strong>Final adapters and entry points:</strong> <code>AdditiveInterventionSamplingBridge</code>, <code>AdditiveInterventionSamplingConvergence</code>, <code>AdditiveInterventionSamplingProjectedConvergence</code>.</li> </ul> <p>This grouping is intentionally higher-level than the 50-module root import. Exact declaration-level edges are listed in <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md" rel="external nofollow noopener" target="_blank"><code>docs/THEOREM_MAP.md</code></a>.</p> </details> <h2 id="lean-verification">8. Lean Verification</h2> <div class="note-verification"> <span class="note-label">Checked development</span> Lean <code>v4.34.0-rc2</code> · Mathlib <code>85e3a25e006c35636f0e53b0e9296caca2685bc0</code> · 50/50 root imports · local and GitHub Actions builds successful · <code>Build completed successfully (8814 jobs)</code> </div> <p>The development derives the selected moments from the universal fresh conditional law, then proves concrete oracle conditional unbiasedness, integrability, and moment bounds. It also formalizes actual Euclidean projection, entropy/Pinsker geometry and mirror regret, spectral curvature, the primal recursion, telescoping convergence, and finite Jensen averaging.</p> <p>A source audit found no genuine occurrences of <code>sorry</code>, <code>admit</code>, <code>sorryAx</code>, custom <code>axiom</code> declarations, <code>unsafe</code>, <code>opaque</code>, <code>native_decide</code>, <code>implemented_by</code>, or <code>extern</code>. Local <code>#print axioms</code> checks for the central projection, oracle-integrability, and final convergence theorems report only <code>propext</code>, <code>Classical.choice</code>, and <code>Quot.sound</code>, the standard kernel dependencies reached through Mathlib.</p> <p>The six final projected public entry points are listed exactly in <a href="#appendix-b--constants-and-all-theorem-variants">Appendix B</a>. These facts describe a checked conditional development; they are not a claim of peer review or independent third-party reproduction.</p> <h3 id="use-of-ai-and-formal-verification">Use of AI and Formal Verification</h3> <p>AI tools assisted with library API discovery, translation of paper arguments into Lean statements, refactoring, debugging, and adversarial correspondence audits. Model output was never treated as mathematical evidence by itself.</p> <p>Claims were retained only after Lean elaboration and kernel checking, successful full builds, axiom inspection, source scans, and repeated comparisons between the source semantics, the mathematical note, and the public Lean declarations. The mathematical note and kernel-checked terms—not an AI transcript—are the evidence for the claims on this page.</p> <h3 id="reproducibility">Reproducibility</h3> <details> <summary>Pinned toolchain, build commands, and public artifacts</summary> <pre><code>lake exe cache get
+lake build</code></pre> <ul> <li>Lean: <code>v4.34.0-rc2</code> </li> <li>Mathlib: <code>85e3a25e006c35636f0e53b0e9296caca2685bc0</code> </li> <li>Local build record: <code>Build completed successfully (8814 jobs)</code> </li> </ul> <p>Artifacts: <a href="/assets/pdf/negdro-formalization-note.pdf">PDF</a> · <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/README.md" rel="external nofollow noopener" target="_blank">README</a> · <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/THEOREM_MAP.md" rel="external nofollow noopener" target="_blank">Theorem map</a> · <a href="https://github.com/Eleanoreee/NegDROFormalization/blob/main/docs/ASSUMPTION_LEDGER.md" rel="external nofollow noopener" target="_blank">Assumption ledger</a></p> <p>The GitHub repository and verification artifacts are publicly accessible under the Apache License 2.0.</p> </details> </div> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Tingyu Wu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Last updated: September 22, 2026. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> </body> </html>
