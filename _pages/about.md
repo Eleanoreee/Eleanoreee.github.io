@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: Optimization · Machine Learning Theory · Distributionally Robust Optimization
+subtitle: Mathematics · University of Illinois Urbana-Champaign
 
 profile:
   align: right
@@ -26,11 +26,13 @@ latest_posts:
 
 ## Bio
 
-I am an undergraduate student in Mathematics at the University of Illinois Urbana-Champaign, concentrating in Data Optimization and minoring in Statistics. I plan to apply to PhD programs in operations research and related fields, and I am currently seeking full-time research assistant opportunities.
+I am an undergraduate student in Mathematics at the University of Illinois Urbana-Champaign, concentrating in Data Optimization and minoring in Statistics. I expect to graduate in Fall 2026 and plan to apply to PhD programs in operations research and related fields for Fall 2027 entry. I am currently seeking full-time research assistant opportunities beginning in Spring 2027.
 
-I am currently conducting independent research with [Professor Yifan Hu](https://sites.google.com/view/yifan-hu/home) on high-probability convergence guarantees for sample-average approximation and stochastic minimax optimization, as well as convergence questions arising in causal invariance learning.
+I am currently conducting independent research with [Professor Yifan Hu](https://sites.google.com/view/yifan-hu/home) on high-probability solution-set convergence for continuous sample-average approximation and nonconvex-concave stochastic minimax optimization; convergence analysis for regularized minimax methods in causal invariance learning; and causal identification in BLP demand models through invariance across environments, with connections to instrumental variables and GMM.
 
 Previously, I worked with [Professor Felix Leditzky](https://felixleditzky.info/) through the Illinois Mathematics Lab on numerical optimization for entropy-based problems in quantum information theory. This project received the Nancy D. Anderson Undergraduate Research Award.
+
+I welcome conversations about research and potential collaborations. Please feel free to reach out by email.
 
 ## Research Interests
 
